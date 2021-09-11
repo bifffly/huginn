@@ -15,12 +15,9 @@ fn build_ui(app: &gtk::Application) {
     window.set_position(gtk::WindowPosition::Center);
 
     let wbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
-
-    let toolbar = create_toolbar();
-    wbox.pack_start(&toolbar, false, false, 0);
-
-    let render_area = create_render_area();
-    wbox.pack_start(&render_area, true, true, 0);
+    let huginn = Huginn::new();
+    wbox.pack_start(&huginn.toolbar.toolbar, false, false, 0);
+    wbox.pack_start(&huginn.render_area, true, true, 0);
 
     window.add(&wbox);
     window.show_all();
