@@ -17,15 +17,11 @@ fn build_ui(app: &gtk::Application) {
     let wbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
     let menubar: gtk::Box = create_menubar(&window);
-    // wbox.pack_start(&menubar, false, false, 0);
+    wbox.pack_start(&menubar, false, false, 0);
 
-    let mut notebook = Notebook::new();
-    let title = "Welcome to Huginn";
-    let label = gtk::Label::new(Some(&*title));
-    notebook.create_tab(&title, label.upcast());
-    // wbox.pack_start(&notebook.notebook, false, false, 0);
+    let notebook = create_notebook();
+    wbox.pack_start(&notebook, false, false, 0);
 
-    window.add(&notebook.notebook);
-
+    window.add(&wbox);
     window.show_all();
 }
