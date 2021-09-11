@@ -6,4 +6,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dns-lookup = "1.0.8"
 gtk = "0.14"
+url = "2.2.2"

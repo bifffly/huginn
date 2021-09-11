@@ -1,3 +1,4 @@
+use dns_lookup::lookup_host;
 use gtk::prelude::*;
 use gtk::{
     Align, Box, Button, IconSize, Image, Label,
@@ -5,6 +6,7 @@ use gtk::{
 };
 use std::io::{Read, Write};
 use std::net::TcpStream;
+use url::Url;
 
 pub struct Huginn {
     pub toolbar: Toolbar,
@@ -71,20 +73,8 @@ fn create_render_area(search_entry: &SearchEntry, search_button: &Button) -> Scr
     let label_clone = label.clone();
     search_button.connect_clicked(move |_| {
         let address = &search_entry_clone.text().to_string();
-        let addr_split = address.split("/").collect::<Vec<&str>>();
-	let mut stream = TcpStream::connect(addr_split[0]).unwrap();
-        let writestr = "odin\tpull\t".to_owned() + &addr_split[1];
-        stream.write(writestr.as_bytes());
-        let mut buffer = [0; 4096];
-        stream.read(&mut buffer).unwrap();
-        let mut v = vec![];
-        for byte in buffer {
-            match byte {
-                0 => break,
-                _ => v.push(byte),
-            }
-        }
-        label.set_text(&String::from_utf8_lossy(&v[..]).to_string());
+        let response = send_request(address);
+        label.set_text(&response);
     });
 
     let render_area = ScrolledWindow::builder()
@@ -93,4 +83,22 @@ fn create_render_area(search_entry: &SearchEntry, search_button: &Button) -> Scr
         .build();
 
     return render_area;
+}
+
+fn send_request(address: &String) -> String {
+    let url = Url::parse(address).unwrap();
+    let ipaddr = lookup_host(url.host_str().unwrap()).unwrap()[0];
+    let mut stream = TcpStream::connect(ipaddr.to_string() + &":1866").unwrap();
+    let writestr = "odin\tpull\t".to_owned() + &url.path();
+    stream.write(writestr.as_bytes());
+    let mut buffer = [0; 4096];
+    stream.read(&mut buffer).unwrap();
+    let mut v = vec![];
+    for byte in buffer {
+        match byte {
+            0 => break,
+            _ => v.push(byte),
+        }
+    }
+    return String::from_utf8_lossy(&v[..]).to_string();
 }
