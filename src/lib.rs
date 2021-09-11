@@ -3,6 +3,8 @@ use gtk::{
     Align, Box, Button, IconSize, Image, Label,
     Orientation, SearchEntry, ScrolledWindow
 };
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub struct Huginn {
     pub toolbar: Toolbar,
@@ -12,7 +14,7 @@ pub struct Huginn {
 impl Huginn {
     pub fn new() -> Self {
         let toolbar = create_toolbar();
-        let render_area = create_render_area();
+        let render_area = create_render_area(&toolbar.search_button);
         return Huginn {toolbar, render_area};
     }
 }
@@ -58,15 +60,22 @@ fn create_toolbar() -> Toolbar {
     return Toolbar {toolbar, search_entry, search_button};
 }
 
-fn create_render_area() -> ScrolledWindow {
+fn create_render_area(search_button: &Button) -> ScrolledWindow {
+    let label_text = Rc::new(RefCell::new("Before Click".to_string()));
+    let label_text_clone = label_text.clone();
     let label = Label::builder()
-        .label("")
+        .label(&label_text_clone.borrow())
         .wrap(true)
         .xalign(0.0)
         .yalign(0.0)
         .build();
+    let label_clone = label.clone();
+    search_button.connect_clicked(move |_| {
+        label.set_text("After Click");
+    });
+
     let render_area = ScrolledWindow::builder()
-        .child(&label)
+        .child(&label_clone)
         .valign(Align::Fill)
         .build();
 
