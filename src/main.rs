@@ -16,11 +16,11 @@ fn build_ui(app: &gtk::Application) {
 
     let wbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
-    let menubar: gtk::Box = create_menubar(&window);
-    wbox.pack_start(&menubar, false, false, 0);
+    let toolbar = create_toolbar();
+    wbox.pack_start(&toolbar, false, false, 0);
 
     let notebook = create_notebook();
-    wbox.pack_start(&notebook, false, false, 0);
+    wbox.pack_start(&notebook, true, true, 0);
 
     window.add(&wbox);
     window.show_all();
