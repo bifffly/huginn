@@ -17,7 +17,7 @@ fn build_ui(app: &gtk::Application) {
     let wbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
     let huginn = Huginn::new();
     wbox.pack_start(&huginn.toolbar.toolbar, false, false, 0);
-    wbox.pack_start(&huginn.render_area, true, true, 0);
+    wbox.pack_start(&huginn.notebook.notebook, true, true, 0);
 
     window.add(&wbox);
     window.show_all();
