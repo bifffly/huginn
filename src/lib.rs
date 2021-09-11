@@ -3,6 +3,8 @@ use gtk::{
     Align, Box, Button, IconSize, Image, Label,
     Orientation, SearchEntry, ScrolledWindow
 };
+use std::io::{Read, Write};
+use std::net::TcpStream;
 
 pub struct Huginn {
     pub toolbar: Toolbar,
@@ -68,7 +70,21 @@ fn create_render_area(search_entry: &SearchEntry, search_button: &Button) -> Scr
         .build();
     let label_clone = label.clone();
     search_button.connect_clicked(move |_| {
-        label.set_text(&search_entry_clone.text().to_string());
+        let address = &search_entry_clone.text().to_string();
+        let addr_split = address.split("/").collect::<Vec<&str>>();
+	let mut stream = TcpStream::connect(addr_split[0]).unwrap();
+        let writestr = "odin\tpull\t".to_owned() + &addr_split[1];
+        stream.write(writestr.as_bytes());
+        let mut buffer = [0; 4096];
+        stream.read(&mut buffer).unwrap();
+        let mut v = vec![];
+        for byte in buffer {
+            match byte {
+                0 => break,
+                _ => v.push(byte),
+            }
+        }
+        label.set_text(&String::from_utf8_lossy(&v[..]).to_string());
     });
 
     let render_area = ScrolledWindow::builder()
