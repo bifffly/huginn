@@ -19,8 +19,8 @@ fn build_ui(app: &gtk::Application) {
     let toolbar = create_toolbar();
     wbox.pack_start(&toolbar, false, false, 0);
 
-    let notebook = create_notebook();
-    wbox.pack_start(&notebook, true, true, 0);
+    let render_area = create_render_area();
+    wbox.pack_start(&render_area, true, true, 0);
 
     window.add(&wbox);
     window.show_all();

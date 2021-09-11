@@ -1,7 +1,7 @@
 use gtk::prelude::*;
 use gtk::{
-    Align, Box, Button, IconSize, Image, Label, Notebook, 
-    Orientation, PositionType, SearchEntry, ScrolledWindow
+    Align, Box, Button, IconSize, Image, Label,
+    Orientation, SearchEntry, ScrolledWindow
 };
 
 // TOOLBAR
@@ -31,31 +31,28 @@ pub fn create_toolbar() -> Box {
     hbox.pack_start(&search_entry, true, true, 0);
 
     let search_img = Image::builder()
-        .icon_name("edit-find")
+        .icon_name("system-search-symbolic")
         .icon_size(IconSize::Menu)
         .build();
     let search_button = Button::new();
     search_button.add(&search_img);
-    hbox.pack_start(&search_button, false, false, 0);
+    hbox.pack_end(&search_button, false, false, 0);
 
     return hbox;
 }
 
-// NOTEBOOK
-pub fn create_notebook() -> Notebook {
-    let notebook = Notebook::builder()
-        .tab_pos(PositionType::Top)
-        .show_border(true)
+// RENDER AREA
+pub fn create_render_area() -> ScrolledWindow {
+    let lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec diam elit, tristique eget finibus vel, vulputate at eros. Suspendisse euismod lacinia velit, et vestibulum nibh ultricies non. Sed blandit pellentesque magna, non aliquam dolor. Praesent congue velit vitae congue congue. Proin sed sem vel ex tincidunt eleifend et et urna. Mauris sodales dictum tristique. Nam rhoncus quis arcu et lacinia. Duis rutrum faucibus ultricies.";
+    let label = Label::builder()
+        .label(lorem_ipsum)
+        .wrap(true)
+        .xalign(0.0)
+        .yalign(0.0)
         .build();
-    let contentbox = Box::builder()
-        .orientation(Orientation::Vertical)
-        .spacing(10)
-        .build();
-    let content = ScrolledWindow::builder()
+    let scrolled_window = ScrolledWindow::builder()
+        .child(&label)
         .valign(Align::Fill)
         .build();
-    contentbox.pack_start(&content, false, false, 0);
-
-    notebook.append_page(&contentbox, Some(&Label::new(Some("Welcome to Huginn"))));
-    return notebook;
+    return scrolled_window;
 }
