@@ -1,141 +1,111 @@
-use flume::{Receiver, Sender, SendError};
-use futures::task::LocalSpawnExt;
-use gtk::glib::MainContext;
-use gtk::prelude::*;
-use gtk::{
-    Box, Button, IconSize, Image, Label, Notebook,
-    Orientation, PackType, SearchEntry, ScrolledWindow
+use vgtk::{
+	Callback, Component, gtk, UpdateAction, VNode
 };
+use vgtk::ext::*;
+use vgtk::lib::gio::ApplicationFlags;
+use vgtk::lib::gtk::*;
 
-#[derive(Debug)]
-pub enum Msg {
-    NEWTAB
-}
-
+#[derive(Clone, Debug, Default)]
 pub struct Huginn {
-    pub toolbar: Toolbar,
-    pub notebook: NotebookArea,
-    pub sender: Sender<Msg>
+
 }
 
-impl Huginn {
-    pub fn new() -> Self {
-        let toolbar = Toolbar::new();
-        let toolbar_clone = toolbar.clone();
-        
-        let mut notebook = NotebookArea::new();
-        let notebook_clone = notebook.clone();
-        notebook.add_tab();
-        
-        let (sender, receiver): (Sender<Msg>, Receiver<Msg>) = flume::unbounded();
-        let sender_clone = sender.clone();
-
-        let mut this = Self {
-            toolbar: toolbar_clone, 
-            notebook: notebook_clone, 
-            sender: sender_clone
-        };
-        this.bind();
-        let handle = MainContext::default().spawn_local_with_handle(async move {
-            while let Ok(msg) = receiver.recv_async().await {
-                this.handle_msg(msg);
-            }
-        }).unwrap();
-
-        return Self {toolbar, notebook, sender};
-    }
-
-    pub fn handle_msg(&mut self, msg: Msg) {
-        match msg {
-            Msg::NEWTAB => self.notebook.add_tab(),
-        }
-    }
-
-    pub fn bind(&mut self) {
-        let sender_clone = self.sender.clone();
-        self.notebook.new_tab_button.connect_clicked(move |_| {
-            println!("NEWTAB");
-            let res = sender_clone.send(Msg::NEWTAB);
-        });
-    }
+#[derive(Clone, Debug)]
+pub enum Msg {
+	BACK,
+	NEXT,
+	SEARCH,
+	EXIT
 }
 
-#[derive(Clone)]
+impl Component for Huginn {
+	type Message = Msg;
+	type Properties = ();
+
+	fn update(&mut self, msg: Msg) -> UpdateAction<Self> {
+		match msg {
+			Msg::BACK => {
+				println!("Back");
+				return UpdateAction::None;
+			},
+			Msg::NEXT => {
+				println!("Next");
+				return UpdateAction::None;
+			},
+			Msg::SEARCH => {
+				println!("Search");
+				return UpdateAction::None;
+			},
+			Msg::EXIT => {
+				println!("Exit");
+				return UpdateAction::None;
+			}
+		}
+	}
+
+	fn view(&self) -> VNode<Huginn> {
+		gtk! {
+			<Application::new_unwrap(None, ApplicationFlags::empty())>
+				<Window default_width=800 default_height=600 on destroy=|_| Msg::EXIT> 
+					<Box orientation=Orientation::Vertical spacing=10>
+						<@Toolbar
+							back_clicked=|_| Msg::BACK
+							next_clicked=|_| Msg::NEXT
+							search_clicked=|_| Msg::SEARCH
+						/>
+						<Label label="Huginn"/>
+					</Box>
+				</Window>
+			</Application>
+		}
+	}
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct Toolbar {
-    pub toolbar: Box,
-    search_entry: SearchEntry,
-    search_button: Button
+	pub back_clicked: Callback<()>,
+	pub next_clicked: Callback<()>,
+	pub search_clicked: Callback<()>
 }
 
-impl Toolbar {
-    pub fn new() -> Self {
-        let toolbar = Box::builder()
-            .orientation(Orientation::Horizontal)
-            .spacing(0)
-        .build();
-        let back_img = Image::builder()
-            .icon_name("go-previous")
-            .icon_size(IconSize::Menu)
-            .build();
-        let back_button = Button::new();
-        back_button.add(&back_img);
-        toolbar.pack_start(&back_button, false, false, 0);
-    
-        let next_img = Image::builder()
-            .icon_name("go-next")
-            .icon_size(IconSize::Menu)
-            .build();
-        let next_button = Button::new();
-        next_button.add(&next_img);
-        toolbar.pack_start(&next_button, false, false, 0);
+impl Component for Toolbar {
+	type Message = Msg;
+	type Properties = Self;
 
-        let search_entry = SearchEntry::new();
-        toolbar.pack_start(&search_entry, true, true, 0);
-    
-        let search_img = Image::builder()
-            .icon_name("system-search-symbolic")
-            .icon_size(IconSize::Menu)
-            .build();
-        let search_button = Button::new();
-        search_button.add(&search_img);
-        toolbar.pack_end(&search_button, false, false, 0);
+	fn create(props: Self) -> Self {
+		return props;
+	}
 
-        return Toolbar {toolbar, search_entry, search_button};
-    }
-}
+	fn change(&mut self, props: Self) -> UpdateAction<Self> {
+		*self = props;
+		return UpdateAction::Render;
+	}
 
-#[derive(Clone)]
-pub struct NotebookArea {
-    pub notebook: Notebook,
-    tabs: Vec<ScrolledWindow>,
-    new_tab_button: Button
-}
+	fn update(&mut self, msg: Msg) -> UpdateAction<Self> {
+		match msg {
+			Msg::BACK => {self.back_clicked.send(());},
+			Msg::NEXT => {self.next_clicked.send(());},
+			Msg::SEARCH => {self.search_clicked.send(());},
+			_ => {}
+		}
+		return UpdateAction::None;
+	}
 
-impl NotebookArea {
-    pub fn new() -> Self {
-        let notebook = Notebook::new();
-        let new_tab_img = Image::builder()
-            .icon_name("document-new-symbolic")
-            .icon_size(IconSize::Menu)
-            .build();
-        let new_tab_button = Button::new();
-
-        let tabs: Vec<ScrolledWindow> = vec![];
-
-        new_tab_button.add(&new_tab_img);
-        notebook.set_action_widget(&new_tab_button, PackType::End);
-        new_tab_button.show_all();
-
-        return NotebookArea {notebook, tabs, new_tab_button};
-    }
-
-    pub fn add_tab(&mut self) {
-        let window = ScrolledWindow::builder()
-            .build();
-        let label = Label::new(Some("New tab"));
-        let tab_n = self.notebook.append_page(&window, Some(&label));
-        self.tabs.push(window);
-        self.notebook.set_current_page(Some(tab_n));
-    }
+	fn view(&self) -> VNode<Self> {
+		gtk! {
+			<Box orientation=Orientation::Horizontal spacing=10>
+				<Button image="go-previous" on clicked=|_| {
+					Msg::BACK
+				}/>
+				<Button image="go-next" on clicked=|_| {
+					Msg::NEXT
+				}/>
+				<SearchEntry hexpand=true/>
+				<Button image="system-search-symbolic" on clicked=|_| {
+					Msg::SEARCH
+				}/>
+			</Box>
+		}
+	}
 }
 
