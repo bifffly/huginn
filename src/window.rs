@@ -13,21 +13,22 @@ impl Component for HuginnWindow {
         match msg {
             Msg::BACK => {
                 println!("Back");
-                return UpdateAction::None;
             },
             Msg::NEXT => {
                 println!("Next");
-                return UpdateAction::None;
             },
-            Msg::SEARCH => {
-                println!("Search");
-                return UpdateAction::None;
+            Msg::SEARCH_CHANGE {url} => {
+                self.url = url.clone();
+                println!("SEARCH_CHANGE {}", self.url);
+            },
+            Msg::SEARCH_SEND => {
+                println!("SEARCH_SEND");
             },
             Msg::EXIT => {
                 println!("Exit");
-                return UpdateAction::None;
             }
-        }
+        };
+        return UpdateAction::None;
     }
 
     fn view(&self) -> VNode<Self> {
@@ -36,9 +37,10 @@ impl Component for HuginnWindow {
                 <Window default_width=800 default_height=600 on destroy=|_| Msg::EXIT> 
                     <Box orientation=Orientation::Vertical spacing=10>
                         <@HuginnToolbar
-                            back_clicked=|_| Msg::BACK
-                            next_clicked=|_| Msg::NEXT
-                            search_clicked=|_| Msg::SEARCH
+                            on_back=|_| Msg::BACK
+                            on_next=|_| Msg::NEXT
+                            on_search_change=|url| Msg::SEARCH_CHANGE {url}
+                            on_search_send=|url| Msg::SEARCH_SEND
                         />
                         <Label label="Huginn"/>
                     </Box>

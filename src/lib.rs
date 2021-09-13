@@ -7,17 +7,25 @@ pub mod toolbar;
 pub enum Msg {
     BACK,
     NEXT,
-    SEARCH,
+    SEARCH_CHANGE {url: String},
+    SEARCH_SEND,
     EXIT
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct HuginnWindow {}
+pub struct HuginnWindow {
+    pub url: String
+}
 
 #[derive(Clone, Debug, Default)]
 pub struct HuginnToolbar {
-    pub back_clicked: Callback<()>,
-    pub next_clicked: Callback<()>,
-    pub search_clicked: Callback<()>
+    pub url: String,
+    pub on_back: Callback<()>,
+    pub on_next: Callback<()>,
+    pub on_search_change: Callback<String>,
+    pub on_search_send: Callback<()>
 }
+
+#[derive(Clone, Debug, Default)]
+pub struct HuginnDisplay {}
 

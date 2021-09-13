@@ -18,11 +18,21 @@ impl Component for HuginnToolbar {
 
     fn update(&mut self, msg: Msg) -> UpdateAction<Self> {
         match msg {
-            Msg::BACK => {self.back_clicked.send(());},
-            Msg::NEXT => {self.next_clicked.send(());},
-            Msg::SEARCH => {self.search_clicked.send(());},
+            Msg::BACK => {
+                self.on_back.send(());
+            },
+            Msg::NEXT => {
+                self.on_next.send(());
+            },
+            Msg::SEARCH_CHANGE {url} => {
+                let url_clone = url.clone();
+                self.on_search_change.send(url_clone);
+            },
+            Msg::SEARCH_SEND => {
+                self.on_search_send.send(());
+            }
             _ => {}
-        }
+        };
         return UpdateAction::None;
     }
 
@@ -33,8 +43,12 @@ impl Component for HuginnToolbar {
                     <Button image="go-previous" on clicked=|_| Msg::BACK/>
                     <Button image="go-next" on clicked=|_| Msg::NEXT/>
                 </ButtonBox>
-                <SearchEntry hexpand=true/>
-                <Button image="system-search-symbolic" on clicked=|_| Msg::SEARCH/>
+                <SearchEntry hexpand=true on search_changed=|entry| {
+                    Msg::SEARCH_CHANGE {
+                        url: entry.get_text().as_str().to_string()
+                    }
+                }/>
+                <Button image="system-search-symbolic" on clicked=|_| Msg::SEARCH_SEND/> 
             </Box>
         }
     }
