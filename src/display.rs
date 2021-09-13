@@ -3,6 +3,7 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 use url::Url;
 use vgtk::{Component, gtk, UpdateAction, VNode};
+use vgtk::ext::*;
 use vgtk::lib::gtk::*;
 
 use crate::*;
@@ -34,10 +35,30 @@ impl Component for HuginnDisplay {
         gtk! {
             <ScrolledWindow vexpand=true>
                 <Box orientation=Orientation::Vertical spacing=10>
-                    {components.iter().map(Display::render)}
+                    {components.iter().map(HuginnComponent::render)}
                 </Box>
             </ScrolledWindow>
         }
+    }
+}
+
+#[derive(Clone, Debug)]
+struct HuginnComponent {
+    pub label: String
+}
+
+impl HuginnComponent {
+    fn new<S: ToString>(string: S) -> Self {
+        let label = string.to_string();
+        return Self {label};
+    } 
+
+    fn render(&self) -> VNode<HuginnDisplay> {
+        let label = self.label.clone();
+
+        gtk! {
+            <Label xalign=0.0 yalign=0.0 markup=label/>
+        }       
     }
 }
 
@@ -65,29 +86,33 @@ fn send_request(url_string: String) -> String {
     }
 }
 
-fn odin_to_components(text: String) -> Vec<Display> {
+fn get_arg(text: &str) -> &str {
+    let split_right = text.split("@head(").collect::<Vec<&str>>()[1];
+    let split_left = split_right.split(")").collect::<Vec<&str>>()[0];
+    return split_left;
+}
+
+fn odin_to_components(text: String) -> Vec<HuginnComponent> {
     let mut lines = text.split("\n").collect::<Vec<&str>>();
     lines.retain(|line| !line.is_empty());
-    return lines.iter().map(Display::new).collect::<Vec<Display>>();
-}
-
-#[derive(Clone, Debug)]
-struct Display {
-    pub label: String
-}
-
-impl Display {
-    fn new<S: ToString>(string: S) -> Self {
-        let label = string.to_string();
-        return Self {label};
-    } 
-
-    fn render(&self) -> VNode<HuginnDisplay> {
-        let label = self.label.clone();
-
-        gtk! {
-            <Label xalign=0.0 yalign=0.0 label=label/>
-        }       
+    let mut label_strings = vec![];
+    for line in lines {
+        if line.starts_with("@head") {
+            let text = "<span size=\"xx-large\"><b>".to_owned() + get_arg(line).trim_end() + "</b></span>";
+            label_strings.push(text);
+        }
+        else if line.starts_with("@hhead") {
+            let text = "<span size=\"x-large\"><b>".to_owned() + get_arg(line).trim_end() + "</b></span>";
+            label_strings.push(text);
+        }
+        else if line.starts_with("@hhhead") {
+            let text = "<span size=\"large\"><b>".to_owned() + get_arg(line).trim_end() + "</b></span>";
+            label_strings.push(text);
+        }
+        else {
+            label_strings.push(line.trim_end().to_string());
+        }
     }
+    return label_strings.iter().map(HuginnComponent::new).collect::<Vec<HuginnComponent>>();
 }
 
