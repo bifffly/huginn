@@ -29,8 +29,10 @@ impl Component for HuginnToolbar {
     fn view(&self) -> VNode<Self> {
         gtk! {
             <Box orientation=Orientation::Horizontal spacing=10>
-                <Button image="go-previous" on clicked=|_| Msg::BACK/>
-                <Button image="go-next" on clicked=|_| Msg::NEXT/>
+                <ButtonBox orientation=Orientation::Horizontal layout=ButtonBoxStyle::Expand>
+                    <Button image="go-previous" on clicked=|_| Msg::BACK/>
+                    <Button image="go-next" on clicked=|_| Msg::NEXT/>
+                </ButtonBox>
                 <SearchEntry hexpand=true/>
                 <Button image="system-search-symbolic" on clicked=|_| Msg::SEARCH/>
             </Box>
