@@ -21,10 +21,10 @@ impl Component for HuginnWindow {
     fn update(&mut self, msg: Msg) -> UpdateAction<Self> {
         match msg {
             Msg::BACK => {
-                println!("Back");
+                println!("BACK");
             },
             Msg::NEXT => {
-                println!("Next");
+                println!("NEXT");
             },
             Msg::SEARCH_CHANGE {url} => {
                 self.url = url.clone();
@@ -35,7 +35,7 @@ impl Component for HuginnWindow {
                 return UpdateAction::Render;
             },
             Msg::EXIT => {
-                println!("Exit");
+                println!("EXIT");
             }
         };
         return UpdateAction::None;

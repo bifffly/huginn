@@ -1,3 +1,7 @@
+use dns_lookup::lookup_host;
+use std::io::{Read, Write};
+use std::net::TcpStream;
+use url::Url;
 use vgtk::{Component, gtk, UpdateAction, VNode};
 use vgtk::lib::gtk::*;
 
@@ -25,10 +29,65 @@ impl Component for HuginnDisplay {
 
     fn view(&self) -> VNode<Self> {
         let url = self.url.clone();
+        let response = send_request(url);
+        let components = odin_to_components(response);
         gtk! {
-            <ScrolledWindow>
-                <Label label=url/>
+            <ScrolledWindow vexpand=true>
+                <Box orientation=Orientation::Vertical spacing=10>
+                    {components.iter().map(Display::render)}
+                </Box>
             </ScrolledWindow>
         }
     }
 }
+
+fn send_request(url_string: String) -> String {
+    let url_result = Url::parse(&url_string);
+    if url_result.is_ok() {
+        let url = url_result.ok().unwrap();
+        let ipaddr = lookup_host(url.host_str().unwrap()).unwrap()[0];
+        let mut stream = TcpStream::connect(ipaddr.to_string() + &":1866").unwrap();
+        let reqstr = "odin\tpull\t".to_owned() + &url.path();
+        stream.write(reqstr.as_bytes()).expect("Could not write to stream");
+        let mut buffer = [0; 4096];
+        stream.read(&mut buffer).unwrap();
+        let mut v = vec![];
+        for byte in buffer {
+            match byte {
+                0 => break,
+                _ => v.push(byte)
+            }
+        }
+        return String::from_utf8_lossy(&v[..]).to_string();
+    }
+    else {
+        return String::new();
+    }
+}
+
+fn odin_to_components(text: String) -> Vec<Display> {
+    let mut lines = text.split("\n").collect::<Vec<&str>>();
+    lines.retain(|line| !line.is_empty());
+    return lines.iter().map(Display::new).collect::<Vec<Display>>();
+}
+
+#[derive(Clone, Debug)]
+struct Display {
+    pub label: String
+}
+
+impl Display {
+    fn new<S: ToString>(string: S) -> Self {
+        let label = string.to_string();
+        return Self {label};
+    } 
+
+    fn render(&self) -> VNode<HuginnDisplay> {
+        let label = self.label.clone();
+
+        gtk! {
+            <Label xalign=0.0 yalign=0.0 label=label/>
+        }       
+    }
+}
+
