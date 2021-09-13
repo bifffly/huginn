@@ -2,6 +2,7 @@ use vgtk::*;
 
 pub mod window;
 pub mod toolbar;
+pub mod display;
 
 #[derive(Clone, Debug)]
 pub enum Msg {
@@ -27,5 +28,7 @@ pub struct HuginnToolbar {
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct HuginnDisplay {}
+pub struct HuginnDisplay {
+    pub url: String
+}
 
