@@ -3,6 +3,7 @@ use vgtk::*;
 pub mod window;
 pub mod toolbar;
 pub mod display;
+pub mod parser;
 
 #[derive(Clone, Debug)]
 pub enum Msg {
@@ -32,3 +33,7 @@ pub struct HuginnDisplay {
     pub url: String
 }
 
+#[derive(Clone, Debug)]
+pub struct HuginnComponent {
+    pub label: String
+}
