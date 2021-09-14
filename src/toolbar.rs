@@ -1,56 +1,72 @@
-use vgtk::{Component, gtk, UpdateAction, VNode};
-use vgtk::lib::gtk::*;
+use gtk::Orientation;
+use gtk::prelude::*;
+use relm::{connect, init, Relm, Widget};
+use relm_derive::{Msg, widget};
 
-use crate::*;
+use crate::window::*;
 
-impl Component for HuginnToolbar {
-    type Message = Msg;
-    type Properties = Self;
+#[derive(Msg)]
+pub enum ToolbarMsg {
+    BACK,
+    NEXT,
+    SEARCH(String)
+}
 
-    fn create(props: Self) -> Self {
-        return props;
-    }
+pub struct ToolbarModel {
+    relm: Relm<HuginnToolbar>,
+    address: String,
+    title: String
+}
 
-    fn change(&mut self, props: Self) -> UpdateAction<Self> {
-        *self = props;
-        return UpdateAction::Render;
-    }
-
-    fn update(&mut self, msg: Msg) -> UpdateAction<Self> {
-        match msg {
-            Msg::BACK => {
-                self.on_back.send(());
-            },
-            Msg::NEXT => {
-                self.on_next.send(());
-            },
-            Msg::SEARCH_CHANGE {url} => {
-                let url_clone = url.clone();
-                self.on_search_change.send(url_clone);
-            },
-            Msg::SEARCH_SEND => {
-                self.on_search_send.send(());
-            }
-            _ => {}
+#[widget]
+impl Widget for HuginnToolbar {
+    fn model(relm: &Relm<Self>, _: ()) -> ToolbarModel {
+        return ToolbarModel {
+            relm: relm.clone(),
+            address: String::new(),
+            title: String::new()
         };
-        return UpdateAction::None;
     }
 
-    fn view(&self) -> VNode<Self> {
-        gtk! {
-            <Box orientation=Orientation::Horizontal spacing=10>
-                <ButtonBox orientation=Orientation::Horizontal layout=ButtonBoxStyle::Expand>
-                    <Button image="go-previous" on clicked=|_| Msg::BACK/>
-                    <Button image="go-next" on clicked=|_| Msg::NEXT/>
-                </ButtonBox>
-                <SearchEntry hexpand=true on search_changed=|entry| {
-                    Msg::SEARCH_CHANGE {
-                        url: entry.get_text().as_str().to_string()
+    fn update(&mut self, msg: ToolbarMsg) {
+        match msg {
+            ToolbarMsg::SEARCH(address) => {
+                // let address = get_search_entry_address(&address);
+                // self.model.relm.stream().emit(Msg::SEARCH(address));
+            },
+            _ => {}
+        }
+    }
+
+    view! {
+        gtk::HeaderBar {
+            show_close_button: false,
+            custom_title: view! {
+                gtk::Entry {
+                    text: &self.model.address,
+                    input_purpose: gtk::InputPurpose::Url,
+                    max_width_chars: 100,
+                    activate(entry) => {
+                        let text = entry.text();
+                        println!("{}", text);
+                        ToolbarMsg::SEARCH(text.to_string())
                     }
-                }/>
-                <Button image="system-search-symbolic" on clicked=|_| Msg::SEARCH_SEND/> 
-            </Box>
+                }
+            },
+            gtk::ButtonBox {
+                orientation: Orientation::Horizontal,
+                layout: gtk::ButtonBoxStyle::Expand,
+                gtk::Button {
+                    tooltip_text: Some("Back"),
+                    image: Some(&gtk::Image::from_icon_name(Some("go-previous"), gtk::IconSize::Menu)),
+                    clicked(_) => ToolbarMsg::BACK,
+                },
+                gtk::Button {
+                    tooltip_text: Some("Next"),
+                    image: Some(&gtk::Image::from_icon_name(Some("go-next"), gtk::IconSize::Menu)),
+                    clicked(_) => ToolbarMsg::NEXT,
+                }
+            }
         }
     }
 }
-

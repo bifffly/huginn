@@ -1,7 +1,8 @@
-use vgtk::run;
+use relm::Widget;
 
-use huginn::*;
+use huginn::window::*;
 
 fn main() {
-    std::process::exit(run::<HuginnWindow>());
+    HuginnWindow::run(()).expect("Win::run failed");
 }
+
