@@ -9,7 +9,6 @@ export default function Browser() {
 
   const navigate = (navUrl: string) => {
     setUrl(navUrl);
-    console.log(url);
   };
 
   const back = () => {
