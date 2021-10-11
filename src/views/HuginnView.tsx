@@ -1,9 +1,8 @@
-import React = require('React');
+import React from 'React';
+import Browser from '../components/Browser';
 
 export default function App() {
   return (
-    <div>
-      <h1>Welcome to Huginn!</h1>
-    </div>
+    <Browser/>
   );
 }

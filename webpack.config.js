@@ -34,10 +34,10 @@ const config = (name, entry, target) => ({
     writeToDisk: true,
     contentBase: dir('build'),
     stats: 'errors-only',
-  },
+  }
 });
 
 module.exports = [
-  config('main', 'src/main/index.ts', 'electron-main'),
+  config('main', 'src/main/index.tsx', 'electron-main'),
   config('app', 'src/index.tsx', 'electron-renderer'),
 ];
