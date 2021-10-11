@@ -7,27 +7,25 @@ import Toolbar from './Toolbar';
 export default function Browser() {
   let [url, setUrl] = React.useState("");
 
-  const navigate = (navUrl: string) => {
+  const navigate = React.useCallback((navUrl: string) => {
     setUrl(navUrl);
-  };
+  }, [url]);
 
-  const back = () => {
+  const back = React.useCallback(() => {
     console.log("back");
-  };
+  }, []);
 
-  const next = () => {
+  const next = React.useCallback(() => {
     console.log("next");
-  };
+  }, []);
 
   return (
     <Container>
       <Toolbar
-        url={url}
-        setUrl={setUrl}
         onNavigate={navigate}
-        canBack={true}
+        canBack={false}
         onBack={back}
-        canNext={true}
+        canNext={false}
         onNext={next}
       />
       <Display url={url}/>

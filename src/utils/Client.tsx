@@ -17,7 +17,7 @@ export function preflight(url: string) {
   return new Promise((resolve, reject) => {
     let client = new Net.Socket();
     client.connect(1866, parsed.hostname, () => {
-      client.write(`odin\tprefligh\t\t${parsed.path}`);
+      client.write(`odin\tpreflight\t${parsed.path}`);
     });
     client.on('data', (res) => {
       resolve(res.toString());

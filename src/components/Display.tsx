@@ -7,7 +7,8 @@ export default function Display(props: {
 }) {
   let [content, setContent] = React.useState('');
 
-  Client.preflight(props.url).then(() => {
+  Client.preflight(props.url).then((res: any) => {
+    console.log(res.toString());
     Client.pull(props.url).then((res: any) => {
       setContent(res.toString());
     });

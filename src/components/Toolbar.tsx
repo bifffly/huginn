@@ -8,24 +8,14 @@ import Button from './Button';
 import {Horizontal} from './Layout';
 
 export default function Toolbar(props: {
-  url: string,
-  setUrl(url: string): void,
   onNavigate(url: string): void,
   canBack: boolean,
   onBack(): void,
   canNext: boolean,
   onNext(): void
 }) {
-  let url = props.url;
-  let setUrl = props.setUrl;
-
   let [addr, setAddr] = React.useState("");
-
   const $addr = React.useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    setUrl(url);
-  }, [url]);
 
   const changeAddr = React.useCallback((e: React.ChangeEvent) => {
     setAddr((e.target as HTMLInputElement).value);
@@ -36,14 +26,13 @@ export default function Toolbar(props: {
       const url = (e.target as HTMLInputElement).value.trim();
       if (!url) return;
       $addr.current?.blur();
-      setUrl(url);
       props.onNavigate(url);
     }
     else if (e.key === 'Escape') {
       setAddr(addr);
       $addr.current?.blur();
     }
-  }, [url, addr]);
+  }, [addr]);
 
   return (
     <Container>
