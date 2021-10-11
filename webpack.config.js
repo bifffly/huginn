@@ -34,6 +34,10 @@ const config = (name, entry, target) => ({
     writeToDisk: true,
     contentBase: dir('build'),
     stats: 'errors-only',
+  },
+
+  externals: {
+    'net': 'commonjs net'
   }
 });
 
