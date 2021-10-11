@@ -20,7 +20,8 @@ export function preflight(url: string) {
       client.write(`odin\tpreflight\t${parsed.path}`);
     });
     client.on('data', (res) => {
-      resolve(res.toString());
+      let tabsplit = res.toString().split('\t').map(split => split.trim());
+      resolve(tabsplit[1]);
     });
   });
 }
