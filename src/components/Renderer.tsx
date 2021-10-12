@@ -8,6 +8,7 @@ export default function Renderer(props: {
 
   let content = [];
   let items = [];
+  let rows = [];
   for (const line of lines) {
     let args = line.split('\t');
     let type = args.splice(0, 1)[0];
@@ -48,6 +49,16 @@ export default function Renderer(props: {
     else if (type === 'it') {
        items.push(<li>{args[0]}</li>);
     }
+    else if (type === 'untbl') {
+      content.push(<Table>{rows}</Table>);
+      rows = [];
+    }
+    else if (type === 'tblh') {
+      rows.push(<tr>{args.map(arg => <TableHeader>{arg}</TableHeader>)}</tr>);
+    }
+    else if (type === 'tblr') {
+      rows.push(<tr>{args.map(arg => <TableCell>{arg}</TableCell>)}</tr>);
+    }
   }
 
   return (
@@ -64,4 +75,27 @@ const Container = styled.div`
   overflow: hidden scroll;
   font-family: "SF Mono", Menlo, Monaco, monospace;
   font-size: 12px;
+`;
+
+const Table = styled.table`
+  border: 1px solid black;
+  border-collapse: collapse;
+`;
+
+const TableCell = styled.td`
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+`;
+
+const TableHeader = styled.th`
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
 `;
