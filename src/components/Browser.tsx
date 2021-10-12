@@ -14,7 +14,6 @@ export default function Browser(props: {
   let [addr, setAddr] = React.useState('');
 
   const navigate = React.useCallback((url: string, modifyHistory: boolean) => {
-    console.log(`navigate modifyHistory: ${modifyHistory}`);
     Client.preflight(url).then((res: any) => {
       if (res == 'A') {
         Client.pull(url).then((res: any) => {
@@ -40,25 +39,19 @@ export default function Browser(props: {
       setPos(pos + 1);
     }
     setAddr(url);
-
-    console.log(history);
-    console.log(pos + 1);
   }, [pos]);
 
   const back = React.useCallback(() => {
-    console.log("back");
     navigate(history[pos - 1], false);
     setPos(pos - 1);
   }, [pos]);
 
   const next = React.useCallback(() => {
-    console.log("next");
     navigate(history[pos + 1], false);
     setPos(pos + 1);
   }, [pos]);
 
   const refresh = React.useCallback(() => {
-    console.log("refresh");
     navigate(history[pos], false);
   }, [pos]);
 
