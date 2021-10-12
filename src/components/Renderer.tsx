@@ -10,14 +10,27 @@ export default function Renderer(props: {
   let content = [];
   let items = [];
   let rows = [];
+  let tt = false;
+  let ttlines = [];
   for (const line of lines) {
     let args = line.split('\t');
     let type = args.splice(0, 1)[0];
 
-    if (type === 't') {
+    if (tt && type !== 'untt') {
+      ttlines.push(`${line}`);
+    }
+    else if (type === 'tt') {
+      tt = true;
+    }
+    else if (type === 'untt') {
+      content.push(<Code>{ttlines.join('\n')}</Code>);
+      ttlines = [];
+      tt = false;
+    }
+    else if (type === 't') {
       document.title = "Huginn -- " + args[0];
     }
-    if (type === 'h1') {
+    else if (type === 'h1') {
       content.push(<h1>{args[0]}</h1>);
     }
     else if (type === 'h2') {
@@ -79,6 +92,10 @@ const Container = styled.div`
   font-family: "SF Mono", Menlo, Monaco, monospace;
   font-size: 12px;
   user-select: text;
+`;
+
+const Code = styled.pre`
+  background: #EAF1F6;
 `;
 
 const Ref = styled.a`

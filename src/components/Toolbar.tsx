@@ -84,6 +84,6 @@ const AddressField = styled.input`
   background: transparent;
   -webkit-app-region: no-drag;
   &:hover, &:focus {
-    background: #f0f0f0;
+    background: #EAF1F6;
   }
 `;
