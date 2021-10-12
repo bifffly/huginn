@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 export default function Renderer(props: {
-  content: string
+  content: string,
+  navigate(url: string, modifyHistory: boolean): void
 }) {
   let lines = props.content.split('\n');
 
@@ -29,7 +30,9 @@ export default function Renderer(props: {
       content.push(<p>{args[0]}</p>);
     }
     else if (type === 'r') {
-      content.push(<a href=''>{args[0]}</a>);
+      content.push(<Ref onClick={() => {
+        props.navigate(args[1], true);
+      }}>{args[0]}</Ref>);
       content.push(<br/>);
     }
     else if (type === 'lbr') {
@@ -73,8 +76,14 @@ const Container = styled.div`
   height: 100%;
   padding: 24px;
   overflow: hidden scroll;
-  font-family: "SF Mono", Menlo, Monaco, monospace;
+  font-family: "Go Mono", Menlo, Monaco, monospace;
   font-size: 12px;
+`;
+
+const Ref = styled.a`
+  cursor: pointer;
+  color: #0366d6;
+  &:hover {background: #EAF1F6}
 `;
 
 const Table = styled.table`

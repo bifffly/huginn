@@ -71,7 +71,7 @@ export default function Browser(props: {
         canNext={canNext}
         onNext={next}
       />
-      <Renderer content={content}/>
+      <Renderer content={content} navigate={navigate}/>
     </Container>
   );
 }
