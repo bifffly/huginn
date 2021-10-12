@@ -5,7 +5,11 @@ import Renderer from './Renderer';
 import Toolbar from './Toolbar';
 import * as Client from '../utils/Client';
 
-export default function Browser() {
+export default function Browser(props: {
+  history: string[]
+}) {
+  let {history} = props;
+  let [pos, setPos] = React.useState(-1);
   let [content, setContent] = React.useState('');
 
   const navigate = React.useCallback((url: string) => {
@@ -14,7 +18,7 @@ export default function Browser() {
         Client.pull(url).then((res: any) => {
           setContent(res.toString());
         }).catch(() => {
-          setContent(`t\tOdin Error E\nh1\tOdin Error E\np\tServer request error`);
+          setContent(`t\tOdin Error D\nh1\tOdin Error E\np\tServer request error`);
         });
       }
       else if (res == 'B') {
@@ -26,23 +30,38 @@ export default function Browser() {
     }).catch(() => {
       setContent(`t\tOdin Error D\nh1\tOdin Error D\np\tServer request error`);
     });
-  }, []);
+    if (pos + 1 < history.length) {
+      history.length = pos + 1;
+    }
+    history.push(url);
+    setPos(pos + 1);
+
+    console.log(history);
+    console.log(pos + 1);
+  }, [pos]);
 
   const back = React.useCallback(() => {
     console.log("back");
-  }, []);
+    setPos(pos - 1);
+    console.log(pos - 1);
+  }, [pos]);
 
   const next = React.useCallback(() => {
     console.log("next");
-  }, []);
+    setPos(pos + 1);
+    console.log(pos + 1);
+  }, [pos]);
+
+  let canBack = pos > 0;
+  let canNext = pos < history.length - 1;
 
   return (
     <Container>
       <Toolbar
         onNavigate={navigate}
-        canBack={false}
+        canBack={canBack}
         onBack={back}
-        canNext={false}
+        canNext={canNext}
         onNext={next}
       />
       <Renderer content={content}/>
