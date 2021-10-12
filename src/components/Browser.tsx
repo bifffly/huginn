@@ -57,8 +57,14 @@ export default function Browser(props: {
     setPos(pos + 1);
   }, [pos]);
 
+  const refresh = React.useCallback(() => {
+    console.log("refresh");
+    navigate(history[pos], false);
+  }, [pos]);
+
   let canBack = pos > 0;
   let canNext = pos < history.length - 1;
+  let canRefresh = pos > -1;
 
   return (
     <Container>
@@ -70,6 +76,8 @@ export default function Browser(props: {
         onBack={back}
         canNext={canNext}
         onNext={next}
+        canRefresh={canRefresh}
+        onRefresh={refresh}
       />
       <Renderer content={content} navigate={navigate}/>
     </Container>

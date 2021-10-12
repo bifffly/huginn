@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import {
   IoMdArrowBack,
-  IoMdArrowForward
+  IoMdArrowForward,
+  IoMdRefresh
 } from 'react-icons/io';
 import Button from './Button';
 import {Horizontal} from './Layout';
@@ -14,7 +15,9 @@ export default function Toolbar(props: {
   canBack: boolean,
   onBack(): void,
   canNext: boolean,
-  onNext(): void
+  onNext(): void,
+  canRefresh: boolean,
+  onRefresh(): void
 }) {
   let addr = props.addr;
   let setAddr = props.setAddr;
@@ -44,6 +47,9 @@ export default function Toolbar(props: {
       </ToolbarButton>
       <ToolbarButton title="next" disabled={!props.canNext} onClick={props.onNext}>
         <IoMdArrowForward size={22}/>
+      </ToolbarButton>
+      <ToolbarButton title="refresh" disabled={!props.canRefresh} onClick={props.onRefresh}>
+        <IoMdRefresh size={22}/>
       </ToolbarButton>
       <AddressField
         ref={$addr}

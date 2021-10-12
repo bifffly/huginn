@@ -76,8 +76,9 @@ const Container = styled.div`
   height: 100%;
   padding: 24px;
   overflow: hidden scroll;
-  font-family: "Go Mono", Menlo, Monaco, monospace;
+  font-family: "SF Mono", Menlo, Monaco, monospace;
   font-size: 12px;
+  user-select: text;
 `;
 
 const Ref = styled.a`
