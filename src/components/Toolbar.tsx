@@ -8,13 +8,16 @@ import Button from './Button';
 import {Horizontal} from './Layout';
 
 export default function Toolbar(props: {
-  onNavigate(url: string): void,
+  addr: string,
+  setAddr(addr: string): void,
+  onNavigate(url: string, modifyHistory: boolean): void,
   canBack: boolean,
   onBack(): void,
   canNext: boolean,
   onNext(): void
 }) {
-  let [addr, setAddr] = React.useState("");
+  let addr = props.addr;
+  let setAddr = props.setAddr;
   const $addr = React.useRef<HTMLInputElement>(null);
 
   const changeAddr = React.useCallback((e: React.ChangeEvent) => {
@@ -26,7 +29,7 @@ export default function Toolbar(props: {
       const url = (e.target as HTMLInputElement).value.trim();
       if (!url) return;
       $addr.current?.blur();
-      props.onNavigate(url);
+      props.onNavigate(url, true);
     }
     else if (e.key === 'Escape') {
       setAddr(addr);

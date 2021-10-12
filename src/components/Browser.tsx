@@ -11,8 +11,10 @@ export default function Browser(props: {
   let {history} = props;
   let [pos, setPos] = React.useState(-1);
   let [content, setContent] = React.useState('');
+  let [addr, setAddr] = React.useState('');
 
-  const navigate = React.useCallback((url: string) => {
+  const navigate = React.useCallback((url: string, modifyHistory: boolean) => {
+    console.log(`navigate modifyHistory: ${modifyHistory}`);
     Client.preflight(url).then((res: any) => {
       if (res == 'A') {
         Client.pull(url).then((res: any) => {
@@ -30,11 +32,14 @@ export default function Browser(props: {
     }).catch(() => {
       setContent(`t\tOdin Error D\nh1\tOdin Error D\np\tServer request error`);
     });
-    if (pos + 1 < history.length) {
-      history.length = pos + 1;
+    if (modifyHistory) {
+      if (pos + 1 < history.length) {
+        history.length = pos + 1;
+      }
+      history.push(url);
+      setPos(pos + 1);
     }
-    history.push(url);
-    setPos(pos + 1);
+    setAddr(url);
 
     console.log(history);
     console.log(pos + 1);
@@ -42,14 +47,14 @@ export default function Browser(props: {
 
   const back = React.useCallback(() => {
     console.log("back");
+    navigate(history[pos - 1], false);
     setPos(pos - 1);
-    console.log(pos - 1);
   }, [pos]);
 
   const next = React.useCallback(() => {
     console.log("next");
+    navigate(history[pos + 1], false);
     setPos(pos + 1);
-    console.log(pos + 1);
   }, [pos]);
 
   let canBack = pos > 0;
@@ -58,6 +63,8 @@ export default function Browser(props: {
   return (
     <Container>
       <Toolbar
+        addr={addr}
+        setAddr={setAddr}
         onNavigate={navigate}
         canBack={canBack}
         onBack={back}
