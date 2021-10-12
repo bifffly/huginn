@@ -17,7 +17,7 @@ export default function Renderer(props: {
     let type = args.splice(0, 1)[0];
 
     if (tt && type !== 'untt') {
-      ttlines.push(`${line}`);
+      ttlines.push(`${line.indexOf('\t') === 0 ? line.substring(1) : line}`);
     }
     else if (type === 'tt') {
       tt = true;
@@ -29,6 +29,9 @@ export default function Renderer(props: {
     }
     else if (type === 't') {
       document.title = "Huginn -- " + args[0];
+    }
+    else if (type === 'a') {
+      content.push(<a id={args[0]}></a>);
     }
     else if (type === 'h1') {
       content.push(<h1>{args[0]}</h1>);

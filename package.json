@@ -6,7 +6,6 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "electron --trace-warnings .",
-    "electron-start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "brycec17-vt",
